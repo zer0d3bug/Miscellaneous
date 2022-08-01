@@ -1,6 +1,7 @@
 # Checking for the existence of each PowerShell profile files
 # 4 PowerShell Profiles
-#
+# you check to see which, if any, of the four profiles exist, with output like this
+# 
 # --------------------------------------------------------------------
 
 Foreach ($ProfileFile in $ProfileFiles){
