@@ -1,6 +1,5 @@
 # Checking for the existence of each PowerShell profile files
 # Four PowerShell Profiles
-# you check to see which, if any, of the four profiles exist, with output like this
 # 
 # --------------------------------------------------------------------
 
