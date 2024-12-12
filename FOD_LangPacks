@@ -1,0 +1,70 @@
+# Install Windows xx Dictionary files
+#
+#
+#=============================================================================================
+
+function Start-Logging{
+    start-transcript -path $LogFile -Force
+}
+function Stop-Logging{
+    Stop-Transcript
+}
+function Get-ScriptDirectory {
+    if ($psise) {
+        Split-Path $psise.CurrentFile.FullPath
+    }
+    else {
+        $global:PSScriptRoot
+    }
+}
+
+# Set vars
+$SCRIPTDIR = Get-ScriptDirectory
+$SCRIPTNAME = $psise.CurrentFile.FullPath
+$SOURCEROOT = "$SCRIPTDIR\Source"
+$SettingsFile = $SCRIPTDIR + "\" + $SettingsName
+$LANG = (Get-Culture).Name
+$OSV = $Null
+$ARCHITECTURE = $env:PROCESSOR_ARCHITECTURE
+$LogFile = $SCRIPTDIR + "\" + "Install_Transcript.log"
+$Logfile1 = $SCRIPTDIR + "\" + "Font_FODs_24H2.TXT"
+$JPDIC="C:\windows\IME\IMEJP\DICTS\" 
+
+#Start Transcript Logging
+
+. Start-Logging
+
+if (Test-Path $($SCRIPTDIR)) {
+    New-Item $Logfile1 -ErrorAction SilentlyContinue
+} else {
+    New-Item -Path $($SCRIPTDIR) -ItemType Directory
+    New-Item $Logfile1
+}
+"Preparing to install CAB Files" | Add-Content $Logfile1
+$allcabItems = Get-ChildItem -Path $SCRIPTDIR -Filter *.cab -Recurse
+Foreach ($cab in $allcabItems) {
+    Write-host "Installing $($($cab.name -split '~|.cab')[0])"
+    Add-WindowsPackage -Online -PackagePath "$($cab.Fullname)" -logpath "$($SCRIPTDIR)\$($($cab.name -split '~|.cab')[0]).log"
+    #Start-Sleep -s 5
+}
+
+"Completed the install of CAB Files Preparing dictionary files" | Add-Content $Logfile1
+
+<#
+"Checking for Japan dictionary folder" | Add-Content $Logfile1
+$DirCheck = Test-Path($JPDIC) -PathType Container
+If ($DirCheck) {
+    "Japan Dictionary folder exists. Copying dictionary files" | Add-Content $Logfile1
+    Copy-Item -path $SCRIPTDIR\IME-JP\imjptk.DIC -Destination "$JPDIC" 
+    Copy-Item -path $SCRIPTDIR\IME-JP\IMJPZP.DIC -Destination "$JPDIC" 
+    Copy-Item -path $SCRIPTDIR\IME-JP\SDDS0411.DIC -Destination "$JPDIC"         
+    "Copy Complete" | Add-Content $Logfile1
+    "Japan language files complete" | Add-Content $Logfile1
+}
+#>
+
+
+#Stop Logging
+. Stop-Logging
+
+
